@@ -1,0 +1,24 @@
+{
+  "name": "statically-strict-debugger",
+  "version": "1.0.0",
+  "main": "main.js",
+ "scripts": {
+  "build": "tsc",
+  "start": "node build/main.js"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cobbygraves/statically-strict-debugger.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cobbygraves/statically-strict-debugger/issues"
+  },
+  "homepage": "https://github.com/cobbygraves/statically-strict-debugger#readme",
+  "description": "",
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

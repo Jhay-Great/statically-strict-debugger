@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "sourceMap": true,
+    "outDir": "build",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "checkJs": true
+  },
+   "include": [
+    "main.ts",
+    "js/basicSettings.ts",
+    "js/advanceSettings.ts",
+    "js/general.ts"
+  ],
+    "exclude": [
+    "node_modules/**/*",
+    "build/**/*"
+  ]
+}
