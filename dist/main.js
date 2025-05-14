@@ -7,87 +7,68 @@ const advanceFeaturesContainer = document.querySelector(
 );
 const nav = document.querySelector("nav");
 const loader = document.querySelector(".loader-container");
-const generalLightSwitch = document.querySelector(".general_light_switch");
-const wifiSwitch = document.querySelector(".network-container");
-
 // imports
 import Light from "./js/basicSettings.js";
 import AdvanceSettings from "./js/advanceSettings.js";
-
 // object creation
 const lightController = new Light();
 const advancedSettings = new AdvanceSettings();
-
 // global variables
-let selectedComponent: string;
-let isWifiActive: boolean = true;
-
+let selectedComponent;
+let isWifiActive = true;
 // Event handlers
 // hide homepage after button is clicked
 homepageButton?.addEventListener("click", function (e) {
-  lightController.addHidden(homepage!);
-  lightController.removeHidden(loader!);
-
+  lightController.addHidden(homepage);
+  lightController.removeHidden(loader);
   setTimeout(() => {
-    lightController.removeHidden(mainRoomsContainer!);
-    lightController.removeHidden(nav!);
+    lightController.removeHidden(mainRoomsContainer);
+    lightController.removeHidden(nav);
   }, 1000);
 });
-
 mainRoomsContainer?.addEventListener("click", (e) => {
-  const selectedElement = e.target as Element;
-
+  const selectedElement = e.target;
   // when click occurs on light switch
   if (selectedElement?.closest(".light-switch")) {
     const lightSwitch = selectedElement.closest(
       ".basic_settings_buttons"
     )?.firstElementChild;
-    lightController.toggleLightSwitch(lightSwitch!);
+    lightController.toggleLightSwitch(lightSwitch);
     return;
   }
-
   // when click occurs on advance modal
   if (selectedElement.closest(".advance-settings_modal")) {
     const advancedSettingsBtn = selectedElement.closest(
       ".advance-settings_modal"
     );
-    advancedSettings.modalPopUp(advancedSettingsBtn!);
+    advancedSettings.modalPopUp(advancedSettingsBtn);
   }
 });
-
 mainRoomsContainer?.addEventListener("change", (e) => {
-  const slider = e.target as HTMLInputElement;
+  const slider = e.target;
   const value = slider?.value;
   const parsedValue = parseInt(value);
-
   if (!value) return;
-
   lightController.handleLightIntensitySlider(slider, parsedValue);
 });
-
 // advance settings modal
-advanceFeaturesContainer!.addEventListener("click", (e) => {
-  const selectedElement = e.target as Element;
-
+advanceFeaturesContainer?.addEventListener("click", (e) => {
+  const selectedElement = e.target;
   if (selectedElement?.closest(".close-btn")) {
     advancedSettings.closeModalPopUp();
   }
-
   // display customization markup
   if (selectedElement.closest(".customization-btn")) {
     advancedSettings.displayCustomization(selectedElement);
   }
-
   // set light on time customization
   if (selectedElement.matches(".defaultOn-okay")) {
     advancedSettings.customizeAutomaticOnPreset(selectedElement);
   }
-
   // set light off time customization
   if (selectedElement.matches(".defaultOff-okay")) {
     advancedSettings.customizeAutomaticOffPreset(selectedElement);
   }
-
   // cancel light time customization
   if (selectedElement.textContent?.includes("Cancel")) {
     if (selectedElement.matches(".defaultOn-cancel")) {
@@ -96,15 +77,4 @@ advanceFeaturesContainer!.addEventListener("click", (e) => {
       advancedSettings.customizationCancelled(selectedElement, ".defaultOff");
     }
   }
-});
-
-generalLightSwitch!.addEventListener("click", () => {
-  console.log("general switch clicked event");
-  if (isWifiActive) return;
-  lightController.toggleGeneralLightSwitch();
-});
-
-wifiSwitch!.addEventListener("click", () => {
-  console.log("wifi switch clicked event");
-  isWifiActive = !isWifiActive;
 });

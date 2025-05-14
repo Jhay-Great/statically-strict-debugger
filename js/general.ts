@@ -229,6 +229,25 @@ class General {
     const newWord = words.join("_");
     return newWord;
   }
+
+  toggleGeneralLightSwitch() {
+    // turn on/off all lights
+    console.log("toggle general light switch  function");
+    const rooms = Object.values(this.componentsData);
+
+    if (!rooms) return;
+
+    console.log(rooms);
+
+    rooms.forEach((room) => {
+      room.isLightOn = !room.isLightOn;
+    });
+
+    // const lightSwitches = document.querySelectorAll(".light-switch");
+    // lightSwitches.forEach((switchElement) => {
+    //   this.sliderLight(switchElement);
+    // });
+  }
 }
 
 export default General;

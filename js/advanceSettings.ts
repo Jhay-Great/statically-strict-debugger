@@ -1,7 +1,5 @@
-"use strict";
-
-import Light from "./basicSettings.ts";
-import { ComponentData } from "./general.ts";
+import Light from "./basicSettings.js";
+import { ComponentData } from "./general.js";
 
 declare var Chart: any;
 
@@ -261,7 +259,6 @@ class AdvanceSettings extends Light {
     const now: Date = new Date();
     const setTime: number =
       this.formatTime(selectedTime).getTime() - now.getTime();
-    console.log(setTime, now);
     return setTime;
   }
 
