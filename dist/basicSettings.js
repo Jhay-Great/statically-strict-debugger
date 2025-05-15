@@ -1,5 +1,5 @@
 'use strict';
-import General from "./general.js";
+import General from './general.js';
 class Light extends General {
     constructor() {
         super();
@@ -24,18 +24,17 @@ class Light extends General {
         }, 5000);
     }
     lightSwitchOn(lightButtonElement) {
-        lightButtonElement.setAttribute('src', './assets/svgs/light_bulb.svg');
-        lightButtonElement.setAttribute('data-lightOn', './assets/svgs/light_bulb_off.svg');
+        lightButtonElement === null || lightButtonElement === void 0 ? void 0 : lightButtonElement.setAttribute('src', './assets/svgs/light_bulb.svg');
+        lightButtonElement === null || lightButtonElement === void 0 ? void 0 : lightButtonElement.setAttribute('data-lightOn', './assets/svgs/light_bulb_off.svg');
     }
     lightSwitchOff(lightButtonElement) {
         lightButtonElement.setAttribute('src', './assets/svgs/light_bulb_off.svg');
         lightButtonElement.setAttribute('data-lightOn', './assets/svgs/light_bulb.svg');
     }
-    ;
     lightComponentSelectors(lightButtonElement) {
         const room = this.getSelectedComponentName(lightButtonElement);
-        const componentData = this.getComponent(room[0]);
-        const childElement = lightButtonElement.firstElementChild;
+        const componentData = this.getComponent(room);
+        const childElement = lightButtonElement === null || lightButtonElement === void 0 ? void 0 : lightButtonElement.firstElementChild;
         const background = this.closestSelector(lightButtonElement, '.rooms', 'img');
         return { room, componentData, childElement, background };
     }
@@ -50,17 +49,17 @@ class Light extends General {
             component.lightIntensity = 5;
             const lightIntensity = component.lightIntensity / 10;
             this.handleLightIntensity(background, lightIntensity);
-            slider.value = component.lightIntensity;
+            slider.value = component.lightIntensity.toString();
         }
         else {
             this.lightSwitchOff(childElement);
             this.handleLightIntensity(background, 0);
-            slider.value = 0;
+            slider.value = `${0}`;
         }
     }
     handleLightIntensitySlider(element, intensity) {
         const { componentData } = this.lightComponentSelectors(element);
-        if (typeof (intensity) !== 'number' || typeof (intensity) === 'number')
+        if (typeof intensity !== 'number' || isNaN(intensity))
             return;
         componentData.lightIntensity = intensity;
         const lightSwitch = this.closestSelector(element, '.rooms', '.light-switch');
@@ -69,7 +68,7 @@ class Light extends General {
             this.sliderLight(componentData.isLightOn, lightSwitch);
             return;
         }
-        componentData.isLightOn = false;
+        componentData.isLightOn = true;
         this.sliderLight(componentData.isLightOn, lightSwitch);
     }
     sliderLight(isLightOn, lightButtonElement) {

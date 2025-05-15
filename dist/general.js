@@ -7,13 +7,13 @@ class General {
             ['outdoor lights']: { name: 'outdoor lights', lightIntensity: 5, numOfLights: 6, isLightOn: false, autoOn: '06:30', autoOff: '22:00', usage: [15, 12, 13, 9, 12, 13, 18] },
             ['guest room']: { name: 'guest room', lightIntensity: 5, numOfLights: 4, isLightOn: false, autoOn: '06:30', autoOff: '22:00', usage: [12, 10, 3, 9, 5, 5, 18] },
             kitchen: { name: 'kitchen', lightIntensity: 5, numOfLights: 3, isLightOn: false, autoOn: '06:30', autoOff: '22:00', usage: [12, 19, 13, 11, 12, 13, 18] },
-            [['walkway & corridor']]: { name: 'walkway & corridor', lightIntensity: 5, numOfLights: 8, isLightOn: false, autoOn: '06:30', autoOff: '22:00', usage: [12, 19, 13, 15, 22, 23, 18] },
+            ['walkway & corridor']: { name: 'walkway & corridor', lightIntensity: 5, numOfLights: 8, isLightOn: false, autoOn: '06:30', autoOff: '22:00', usage: [12, 19, 13, 15, 22, 23, 18] },
         };
         this.wifiConnections = [
             { id: 0, wifiName: 'Inet service', signal: 'excellent' },
             { id: 1, wifiName: 'Kojo_kwame121', signal: 'poor' },
             { id: 2, wifiName: 'spicyalice', signal: 'good' },
-            { id: 3, wifiName: 'virus', signal: 'good' },
+            { id: 3, wifiName: 'virus', signal: 'good' }
         ];
         this.isLightOn = false;
         this.lightIntensity = 5;
@@ -25,8 +25,9 @@ class General {
         return this.wifiConnections;
     }
     getSelectedComponentName(element, ancestorIdentifier = '.rooms', elementSelector = 'p') {
+        var _a;
         const selectedElement = this.closestSelector(element, ancestorIdentifier, elementSelector);
-        const name = selectedElement.textContent.toLowerCase();
+        const name = (_a = selectedElement === null || selectedElement === void 0 ? void 0 : selectedElement.textContent) === null || _a === void 0 ? void 0 : _a.toLowerCase();
         return name;
     }
     getComponentData(element, ancestorIdentifier, childElement) {
@@ -57,13 +58,13 @@ class General {
         return document.querySelector(identifier);
     }
     closestSelector(selectedElement, ancestorIdentifier, childSelector) {
-        const closestAncestor = selectedElement.closest(ancestorIdentifier);
+        const closestAncestor = selectedElement === null || selectedElement === void 0 ? void 0 : selectedElement.closest(ancestorIdentifier);
         return closestAncestor ? closestAncestor.querySelector(childSelector) : null;
     }
     handleLightIntensity(element, lightIntensity) {
         element.style.filter = `brightness(${lightIntensity})`;
     }
-    updateComponentData(data) {
+    updateComponentData() {
         this.componentsData;
     }
     updateMarkupValue(element, value) {
@@ -93,7 +94,7 @@ class General {
         else {
             parent = this.selector(`.${roomData.name}`);
         }
-        const buttonElement = parent.querySelector('.light-switch');
+        const buttonElement = parent === null || parent === void 0 ? void 0 : parent.querySelector('.light-switch');
         if (roomData['element'])
             return;
         roomData['element'] = buttonElement;

@@ -1,131 +1,136 @@
-'use strict';
+'use strict'
 
-import General from "./general";
-
-interface RoomData {
-    name: string;
-    lightIntensity: number;
-    numOfLights: number;
-    isLightOn: boolean;
-    autoOn: string;
-    autoOff: string;
-    usage: number[];
-    element?: HTMLElement;
-}
+import General from './general.js'
 
 class Light extends General {
-    constructor() {
-        super();
-    }
+  constructor() {
+    super()
+  }
 
-    notification(message: string): string {
-        return `
+  notification(message: string) {
+    return `
             <div class="notification">
                 <div>
-                    <img src="./assets/svgs/checked.svg" alt="Success notification icon">
+                    <img src="./assets/svgs/checked.svg" alt="checked svg icon on notifications" >
                 </div>
                 <p>${message}</p>
             </div>
-        `;
+        `
+  }
+
+  displayNotification(
+    message: string,
+    position: InsertPosition,
+    container: HTMLElement
+  ) {
+    const html = this.notification(message)
+    this.renderHTML(html, position, container)
+  }
+
+  removeNotification(element: HTMLElement) {
+    setTimeout(() => {
+      element.remove()
+    }, 5000)
+  }
+
+  lightSwitchOn(lightButtonElement: HTMLElement | null | undefined) {
+    lightButtonElement?.setAttribute('src', './assets/svgs/light_bulb.svg')
+    lightButtonElement?.setAttribute(
+      'data-lightOn',
+      './assets/svgs/light_bulb_off.svg'
+    )
+  }
+
+  lightSwitchOff(lightButtonElement: HTMLElement) {
+    lightButtonElement.setAttribute('src', './assets/svgs/light_bulb_off.svg')
+    lightButtonElement.setAttribute(
+      'data-lightOn',
+      './assets/svgs/light_bulb.svg'
+    )
+  }
+
+  lightComponentSelectors(lightButtonElement: HTMLElement | null) {
+    const room = this.getSelectedComponentName(lightButtonElement)!
+    const componentData = this.getComponent(room)
+    const childElement = lightButtonElement?.firstElementChild as HTMLElement
+    const background = this.closestSelector(
+      lightButtonElement,
+      '.rooms',
+      'img'
+    ) as HTMLElement
+    return { room, componentData, childElement, background }
+  }
+
+  toggleLightSwitch(lightButtonElement: HTMLElement | null) {
+    const {
+      componentData: component,
+      childElement,
+      background
+    } = this.lightComponentSelectors(lightButtonElement)!
+    const slider = this.closestSelector(
+      lightButtonElement,
+      '.rooms',
+      '#light_intensity'
+    ) as HTMLInputElement
+
+    if (!component) return
+
+    component.isLightOn = !component.isLightOn
+
+    if (component.isLightOn) {
+      this.lightSwitchOn(childElement)
+      component.lightIntensity = 5
+      const lightIntensity = component.lightIntensity / 10
+      this.handleLightIntensity(background, lightIntensity)
+      slider.value = component.lightIntensity.toString()
+    } else {
+      this.lightSwitchOff(childElement)
+      this.handleLightIntensity(background, 0)
+      slider.value = `${0}`
+    }
+  }
+
+  handleLightIntensitySlider(element: HTMLElement, intensity: number) {
+    const { componentData } = this.lightComponentSelectors(element)
+
+    if (typeof intensity !== 'number' || isNaN(intensity)) return
+
+    componentData.lightIntensity = intensity
+
+    const lightSwitch = this.closestSelector(
+      element,
+      '.rooms',
+      '.light-switch'
+    ) as HTMLElement
+
+    if (intensity === 0) {
+      componentData.isLightOn = false
+      this.sliderLight(componentData.isLightOn, lightSwitch)
+      return
     }
 
-    displayNotification(
-        message: string,
-        position: InsertPosition = 'beforeend',
-        container: HTMLElement
-    ): void {
-        const html = this.notification(message);
-        this.renderHTML(html, position, container);
+    componentData.isLightOn = true
+    this.sliderLight(componentData.isLightOn, lightSwitch)
+  }
+
+  sliderLight(isLightOn: boolean, lightButtonElement: HTMLElement | null) {
+    const {
+      componentData: component,
+      childElement,
+      background
+    } = this.lightComponentSelectors(lightButtonElement)
+
+    if (!component) return
+
+    if (isLightOn) {
+      this.lightSwitchOn(childElement)
+      const lightIntensity = component.lightIntensity / 10
+      this.handleLightIntensity(background, lightIntensity)
+    } else {
+      this.lightSwitchOff(childElement)
+      this.handleLightIntensity(background, 0)
     }
-
-    removeNotification(element: HTMLElement): void {
-        setTimeout(() => element.remove(), 5000);
-    }
-
-    lightSwitchOn(lightButtonElement: HTMLImageElement): void {
-        lightButtonElement.src = './assets/svgs/light_bulb.svg';
-        lightButtonElement.dataset.lighton = './assets/svgs/light_bulb_off.svg';
-    }
-
-    lightSwitchOff(lightButtonElement: HTMLImageElement): void {
-        lightButtonElement.src = './assets/svgs/light_bulb_off.svg';
-        lightButtonElement.dataset.lighton = './assets/svgs/light_bulb.svg';
-    }
-
-    lightComponentSelectors(
-        lightButtonElement: HTMLElement
-    ): {
-        room: string | null;
-        componentData: RoomData | undefined;
-        childElement: Element | null;
-        background: HTMLElement | null;
-    } {
-        const room = this.getSelectedComponentName(lightButtonElement);
-        const componentData = room ? this.getComponent(room) : undefined;
-        const childElement = lightButtonElement.firstElementChild;
-        const background = this.closestSelector(lightButtonElement, '.rooms', 'img');
-        
-        return { 
-            room, 
-            componentData, 
-            childElement, 
-            background 
-        };
-    }
-
-    toggleLightSwitch(lightButtonElement: HTMLElement): void {
-        const { componentData, childElement, background } = this.lightComponentSelectors(lightButtonElement);
-        const slider = this.closestSelector(lightButtonElement, '.rooms', '#light_intensity') as HTMLInputElement;
-
-        if (!componentData || !childElement || !background || !slider) return;
-
-        componentData.isLightOn = !componentData.isLightOn;
-
-        if (componentData.isLightOn) {
-            this.lightSwitchOn(childElement as HTMLImageElement);
-            componentData.lightIntensity = 5;
-            const lightIntensity = componentData.lightIntensity / 10;
-            this.handleLightIntensity(background, lightIntensity);
-            slider.value = componentData.lightIntensity.toString();
-        } else {
-            this.lightSwitchOff(childElement as HTMLImageElement);
-            this.handleLightIntensity(background, 0);
-            slider.value = '0';
-        }
-    }
-
-    handleLightIntensitySlider(element: HTMLElement, intensity: number): void {
-        const { componentData } = this.lightComponentSelectors(element);
-        const lightSwitch = this.closestSelector(element, '.rooms', '.light-switch');
-
-        if (!componentData || !lightSwitch) return;
-
-        componentData.lightIntensity = intensity;
-
-        if (intensity === 0) {
-            componentData.isLightOn = false;
-            this.sliderLight(componentData.isLightOn, lightSwitch);
-            return;
-        }
-        
-        componentData.isLightOn = true;
-        this.sliderLight(componentData.isLightOn, lightSwitch);
-    }
-
-    sliderLight(isLightOn: boolean, lightButtonElement: HTMLElement): void {
-        const { componentData, childElement, background } = this.lightComponentSelectors(lightButtonElement);
-
-        if (!componentData || !childElement || !background) return;
-        
-        if (isLightOn) {
-            this.lightSwitchOn(childElement as HTMLImageElement);
-            const lightIntensity = componentData.lightIntensity / 10;
-            this.handleLightIntensity(background, lightIntensity);
-        } else {
-            this.lightSwitchOff(childElement as HTMLImageElement);
-            this.handleLightIntensity(background, 0);
-        }
-    }
+  }
 }
 
-export default Light;
+export default Light

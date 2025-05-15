@@ -1,99 +1,96 @@
-'use strict';
+'use strict'
+// elements declarations
+const homepageButton: HTMLElement = document.querySelector('.entry_point')!
+const homepage: HTMLElement = document.querySelector('main')!
+const mainRoomsContainer: HTMLElement = document.querySelector(
+  '.application_container'
+) as HTMLElement
+const advanceFeaturesContainer: HTMLElement = document.querySelector(
+  '.advanced_features_container'
+) as HTMLElement
+const nav: HTMLElement = document.querySelector('nav')!
+const loader: HTMLElement = document.querySelector('.loader-container')!
 
-// Imports
-import Light from './basicSettings';
-import AdvanceSettings from './advanceSettings';
+// imports
+import Light from './basicSettings'
+import AdvanceSettings from './advanceSettings'
 
-// Object creation
-const lightController = new Light();
-const advancedSettings = new AdvanceSettings();
+// object creation
+const lightController = new Light()
+const advancedSettings = new AdvanceSettings()
 
-// Global variables with types
-let selectedComponent: HTMLElement | null = null;
-let isWifiActive: boolean = true;
+// global variables
+let selectedComponent
+let isWifiActive = true
 
-// DOM Content Loaded handler
-document.addEventListener('DOMContentLoaded', () => {
-    // Element declarations with null checks
-    const homepageButton = document.querySelector<HTMLButtonElement>('.entry_point');
-    const homepage = document.querySelector<HTMLElement>('main');
-    const mainRoomsContainer = document.querySelector<HTMLElement>('.application_container');
-    const advanceFeaturesContainer = document.querySelector<HTMLElement>('.advanced_features_container');
-    const nav = document.querySelector<HTMLElement>('nav');
-    const loader = document.querySelector<HTMLElement>('.loader-container');
+// Event handlers
+// hide homepage after button is clicked
+homepageButton.addEventListener('click', function (e) {
+  lightController.addHidden(homepage)
+  lightController.removeHidden(loader)
 
-    // Helper function for safe DOM operations
-    const safeDOM = {
-        hide: (el: HTMLElement | null) => el && lightController.addHidden(el),
-        show: (el: HTMLElement | null) => el && lightController.removeHidden(el),
-        toggle: (el: HTMLElement | null) => el && lightController.toggleHidden(el)
-    };
+  setTimeout(() => {
+    lightController.removeHidden(mainRoomsContainer)
+    lightController.removeHidden(nav)
+  }, 1000)
+})
 
-    // Event handlers
-    homepageButton?.addEventListener('click', () => {
-        safeDOM.hide(homepage);
-        safeDOM.show(loader);
+mainRoomsContainer.addEventListener('click', (e) => {
+  const selectedElement = e.target as Element
 
-        setTimeout(() => {
-            safeDOM.show(mainRoomsContainer);
-            safeDOM.show(nav);
-            safeDOM.hide(loader);
-        }, 1000);
-    });
+  // when click occurs on light switch
+  if (selectedElement?.closest('.light-switch')) {
+    const lightSwitch = selectedElement?.closest('.basic_settings_buttons')
+      ?.firstElementChild as HTMLElement
+    lightController.toggleLightSwitch(lightSwitch)
+    return
+  }
 
-    // Main container event delegation
-    mainRoomsContainer?.addEventListener('click', (e: MouseEvent) => {
-        const target = e.target as HTMLElement;
-        const lightSwitch = target.closest<HTMLElement>(".light-switch");
-        const advanceModal = target.closest<HTMLElement>('.advance-settings_modal');
+  // when click occurs on advance modal
+  if (selectedElement.closest('.advance-settings_modal')) {
+    const advancedSettingsBtn = selectedElement.closest(
+      '.advance-settings_modal'
+    ) as HTMLElement
+    advancedSettings.modalPopUp(advancedSettingsBtn)
+  }
+})
 
-        if (lightSwitch) {
-            const button = lightSwitch.closest<HTMLElement>(".basic_settings_buttons")?.firstElementChild;
-            if (button) lightController.toggleLightSwitch(button as HTMLElement);
-            return;
-        }
+mainRoomsContainer.addEventListener('change', (e) => {
+  const slider = e.target as HTMLInputElement
+  const value = +slider?.value
 
-        if (advanceModal) {
-            advancedSettings.modalPopUp(advanceModal);
-        }
-    });
+  lightController.handleLightIntensitySlider(slider, value)
+})
 
-    // Light intensity slider
-    mainRoomsContainer?.addEventListener('input', (e: Event) => {
-        const slider = e.target as HTMLInputElement;
-        if (slider.matches('input[type="range"]')) {
-           lightController.handleLightIntensitySlider(slider, Number(slider.value));
-        }
-    });
+// advance settings modal
+advanceFeaturesContainer.addEventListener('click', (e) => {
+  const selectedElement = e.target as HTMLInputElement
 
-    // Advance settings modal
-    advanceFeaturesContainer?.addEventListener('click', (e: MouseEvent) => {
-        const target = e.target as HTMLElement;
-        const closeBtn = target.closest<HTMLElement>('.close-btn');
-        const customBtn = target.closest<HTMLElement>('.customization-btn');
+  if (selectedElement?.closest('.close-btn')) {
+    advancedSettings.closeModalPopUp()
+  }
 
-        if (closeBtn) {
-            advancedSettings.closeModalPopUp();
-            return;
-        }
+  // display customization markup
+  if (selectedElement.closest('.customization-btn')) {
+    advancedSettings.displayCustomization(selectedElement)
+  }
 
-        if (customBtn) {
-            advancedSettings.displayCustomization(customBtn);
-            return;
-        }
+  // set light on time customization
+  if (selectedElement.matches('.defaultOn-okay')) {
+    advancedSettings.customizeAutomaticOnPreset(selectedElement)
+  }
 
-        if (target.matches('.defaultOn-okay')) {
-            advancedSettings.customizeAutomaticOnPreset(target);
-        } 
-        else if (target.matches('.defaultOff-okay')) {
-            advancedSettings.customizeAutomaticOffPreset(target);
-        }
-        else if (target.textContent?.includes("Cancel")) {
-            const parentSection = target.matches('.defaultOn-cancel') ? '.defaultOn' : 
-                                target.matches('.defaultOff-cancel') ? '.defaultOff' : null;
-            if (parentSection) {
-                advancedSettings.customizationCancelled(target, parentSection);
-            }
-        }
-    });
-});
+  // set light off time customization
+  if (selectedElement.matches('.defaultOff-okay')) {
+    advancedSettings.customizeAutomaticOffPreset(selectedElement)
+  }
+
+  // cancel light time customization
+  if (selectedElement?.textContent?.includes('Cancel')) {
+    if (selectedElement.matches('.defaultOn-cancel')) {
+      advancedSettings.customizationCancelled(selectedElement, '.defaultOn')
+    } else if (selectedElement.matches('.defaultOff-cancel')) {
+      advancedSettings.customizationCancelled(selectedElement, '.defaultOff')
+    }
+  }
+})

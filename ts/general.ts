@@ -27,142 +27,159 @@ class General {
         ['walkway & corridor']: { name: 'walkway & corridor', lightIntensity: 5,  numOfLights: 8, isLightOn: false, autoOn: '06:30', autoOff: '22:00', usage: [12, 19, 13, 15, 22, 23, 18] },
     }
 
-    wifiConnections = [
-        {id: 0, wifiName: 'Inet service', signal: 'excellent'},
-        {id: 1, wifiName: 'Kojo_kwame121', signal: 'poor'},
-        {id: 2, wifiName: 'spicyalice', signal: 'good'},
-        {id: 3, wifiName: 'virus', signal: 'good'},
-    ]
-//Types For Class
-    isLightOn: boolean;
-    lightIntensity: number;
+  wifiConnections = [
+    { id: 0, wifiName: 'Inet service', signal: 'excellent' },
+    { id: 1, wifiName: 'Kojo_kwame121', signal: 'poor' },
+    { id: 2, wifiName: 'spicyalice', signal: 'good' },
+    { id: 3, wifiName: 'virus', signal: 'good' }
+  ]
 
-    constructor () {
-        this.isLightOn = false;
-        this.lightIntensity = 5;
-    }
+  isLightOn: boolean
+  lightIntensity: number
 
-  getComponent(name: string): RoomData | undefined {
-  return this.componentsData[name];
-}
+  constructor() {
+    this.isLightOn = false
+    this.lightIntensity = 5
+  }
 
+  getComponent(name: string) {
+    return this.componentsData[name]
+  }
 
-    getWifi() {
-        return this.wifiConnections;
-    }
+  getWifi() {
+    return this.wifiConnections
+  }
 
-    getSelectedComponentName(element: HTMLElement, ancestorIdentifier = '.rooms', elementSelector = 'p'): string | null {
-    const selectedElement = this.closestSelector(element, ancestorIdentifier, elementSelector);
-
-    if (!selectedElement || !selectedElement.textContent) {
-        console.warn('No matching element found for selector:', elementSelector);
-        return null;
-    }
-
-    const name = selectedElement.textContent.toLowerCase();
-    return name;
-}
-
+  getSelectedComponentName(
+    element: HTMLElement | null,
+    ancestorIdentifier = '.rooms',
+    elementSelector = 'p'
+  ) {
+    const selectedElement = this.closestSelector(
+      element,
+      ancestorIdentifier,
+      elementSelector
+    )
+    const name = selectedElement?.textContent?.toLowerCase()
+    return name
+  }
 
   getComponentData(
-  element: HTMLElement,
-  ancestorIdentifier = '.rooms',
-  childElement = 'p'
-): RoomData | undefined {
-  const room = this.getSelectedComponentName(element, ancestorIdentifier, childElement);
-  if (!room) return undefined; 
-  return this.getComponent(room.trim().toLowerCase());
-}
+    element: HTMLElement,
+    ancestorIdentifier: string,
+    childElement: string
+  ) {
+    const room: string = this.getSelectedComponentName(
+      element,
+      ancestorIdentifier,
+      childElement
+    )!
+    const data = this.getComponent(room)
+    return data
+  }
 
-
-
-   renderHTML(element: string, position: InsertPosition, container: HTMLElement): void {
-  container?.insertAdjacentHTML(position, element);
-}
-
-    notification(message: string): string {
-    return `
-        <div class="notification">
-            <p>${message}</p>
-        </div>
-    `;
-}
-
-    displayNotification(
-     message: string,
+  renderHTML(
+    element: string,
     position: InsertPosition,
     container: HTMLElement
-): void {
-  const html = this.notification(message);
-  this.renderHTML(html, position, container);
-}
-
-    rremoveNotification(element: HTMLElement): void {
-  setTimeout(() => element.remove(), 2000);
-}
-
-   selector<T extends HTMLElement>(identifier: string): T | null {
-  return document.querySelector(identifier);
-}
- closestSelector(
-  selectedElement: HTMLElement,
-  ancestorIdentifier: string,
-  childSelector: string
-): HTMLElement | null {
-  const closestAncestor = selectedElement.closest(ancestorIdentifier);
-  return closestAncestor?.querySelector(childSelector) ?? null;
-}
-
-   handleLightIntensity(element: HTMLElement, lightIntensity: number): void {
-  element.style.filter = `brightness(${lightIntensity})`;
-}
-
-   updateComponentData(data: Partial<RoomData>): void {
-  if (data.name && this.componentsData[data.name]) {
-    this.componentsData[data.name] = { 
-      ...this.componentsData[data.name], 
-      ...data 
-    };
-  }
-}
-  updateMarkupValue(element: HTMLElement, value: string | number): void {
-  element.textContent = String(value);
-}
-
-   toggleHidden(element: HTMLElement): void {
-  element.classList.toggle('hidden');
-}
-
-removeHidden(element: HTMLElement): void {
-  element.classList.remove('hidden');
-}
-
-addHidden(element: HTMLElement): void {
-  element.classList.add('hidden');
-}
-
-   setComponentElement(roomData: RoomData): void {
-  let parent: HTMLElement | null = null;
-  
-  if (roomData.name === 'walkway & corridor') {
-    parent = this.selector('.corridor');
-  } else if (roomData.name === 'guest room') {
-    parent = this.selector(`.${this.formatTextToClassName(roomData.name)}`);
-  } else if (roomData.name === 'outdoor lights') {
-    parent = this.selector('.outside_lights');
-  } else {
-    parent = this.selector(`.${roomData.name}`);
+  ) {
+    container.insertAdjacentHTML(position, element)
   }
 
-  const buttonElement = parent?.querySelector<HTMLButtonElement>('.light-switch');
-  if (buttonElement && !roomData.element) {
-    roomData.element = buttonElement;
+  notification(message: string) {
+    return `
+            <div class="notification">
+                <p>${message}</p>
+            </div>
+        `
   }
-}
 
-    private formatTextToClassName(name: string): string {
-  return name.split(' ').join('_');
-}
+  displayNotification(
+    message: string,
+    position: InsertPosition,
+    container: HTMLElement
+  ) {
+    const html = this.notification(message)
+    this.renderHTML(html, position, container)
+  }
+
+  removeNotification(element: HTMLElement) {
+    setTimeout(() => {
+      element.remove()
+    }, 2000)
+  }
+
+  selector(identifier: string) {
+    return document.querySelector(identifier)
+  }
+
+  closestSelector(
+    selectedElement: HTMLElement | null,
+    ancestorIdentifier: string,
+    childSelector: string
+  ) {
+    const closestAncestor = selectedElement?.closest(ancestorIdentifier)
+    return closestAncestor ? closestAncestor.querySelector(childSelector) : null
+  }
+
+  handleLightIntensity(element: HTMLElement, lightIntensity: number) {
+    element.style.filter = `brightness(${lightIntensity})`
+  }
+
+  updateComponentData() {
+    this.componentsData
+  }
+
+  updateMarkupValue(element: HTMLElement, value: string) {
+    element.textContent = value
+  }
+
+  toggleHidden(element: HTMLElement) {
+    element.classList.toggle('hidden')
+  }
+
+  removeHidden(element: HTMLElement) {
+    element.classList.remove('hidden')
+  }
+  addHidden(element: HTMLElement) {
+    element.classList.add('hidden')
+  }
+
+  setComponentElement(roomData: {
+    name: string
+    lightIntensity: number
+    numOfLights: number
+    isLightOn: boolean
+    autoOn: string
+    autoOff: string
+    usage: number[]
+    element?: HTMLElement
+  }) {
+    let parent
+    if (roomData.name === 'walkway & corridor') {
+      parent = this.selector('.corridor')
+    } else if (roomData.name === 'guest room') {
+      const elementClassName = this.formatTextToClassName(roomData.name)
+      parent = this.selector(`.${elementClassName}`)
+    } else if (roomData.name === 'outdoor lights') {
+      parent = this.selector('.outside_lights')
+    } else {
+      parent = this.selector(`.${roomData.name}`)
+    }
+
+    const buttonElement: HTMLElement | undefined =
+      parent?.querySelector('.light-switch')!
+
+    if (roomData['element']) return
+
+    roomData['element'] = buttonElement
+  }
+
+  formatTextToClassName(name: string) {
+    const words = name.split(' ')
+    const newWord = words.join('_')
+    return newWord
+  }
 }
 
 export default General
